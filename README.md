@@ -241,6 +241,24 @@ const client = new Client({
 });
 ```
 
+## Custom SIP Headers
+
+You can include custom SIP headers on both REGISTER and INVITE requests via the `extraHeaders` array:
+
+```javascript
+const client = new Client({
+  account,
+  transport: {
+    wsServers: '<your-ws-server>',
+    iceServers: [],
+    extraHeaders: ['X-Auth-Token: abc123', 'X-Billing-Account: 456789']
+  },
+  media
+});
+
+// All subsequent REGISTER and INVITE requests will include these headers.
+```
+
 ## Generate documentation
 
 [Typedoc](https://typedoc.org/guides/doccomments/) is used to generate the

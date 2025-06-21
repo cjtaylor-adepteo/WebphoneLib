@@ -184,19 +184,25 @@ export class SessionImpl extends EventEmitter implements ISession {
   private reinvitePromise: Promise<boolean>;
 
   private onTerminated: (sessionId: string) => void;
+  /** Custom SIP headers for outgoing requests */
+  private extraHeaders: string[];
 
   protected constructor({
     session,
     media,
     onTerminated,
-    isIncoming
+    isIncoming,
+    extraHeaders = []
   }: {
     session: Inviter | Invitation;
     media: IMedia;
     onTerminated: (sessionId: string) => void;
     isIncoming: boolean;
+    extraHeaders?: string[];
   }) {
     super();
+    // Store custom SIP headers for outgoing requests
+    this.extraHeaders = extraHeaders;
     this.session = session;
     this.id = session.request.callId;
     this.media = new SessionMedia(this, media);
@@ -477,7 +483,11 @@ export class SessionImpl extends EventEmitter implements ISession {
           video: false
         }
       },
-      sessionDescriptionHandlerModifiers
+      sessionDescriptionHandlerModifiers,
+      // Custom SIP headers
+      requestOptions: {
+        extraHeaders: this.extraHeaders
+      }
     };
   }
 

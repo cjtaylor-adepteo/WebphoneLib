@@ -168,6 +168,8 @@ export class ClientImpl extends EventEmitter implements IClient {
 
   private transportFactory: TransportFactory;
   private transport?: ITransport;
+  /** Custom SIP headers for REGISTER and INVITE */
+  private extraHeaders: string[];
 
   constructor(uaFactory: UAFactory, transportFactory: TransportFactory, options: IClientOptions) {
     super();
@@ -184,6 +186,8 @@ export class ClientImpl extends EventEmitter implements IClient {
     }
 
     this.defaultMedia = options.media;
+    // Store custom SIP headers (REGISTER/INVITE)
+    this.extraHeaders = options.transport.extraHeaders || [];
 
     this.transportFactory = transportFactory;
     this.configureTransport(uaFactory, options);
@@ -460,7 +464,8 @@ export class ClientImpl extends EventEmitter implements IClient {
       media: this.defaultMedia,
       session: outgoingSession,
       onTerminated: this.onSessionTerminated.bind(this),
-      isIncoming: false
+      isIncoming: false,
+      extraHeaders: this.extraHeaders
     });
 
     this.addSession(session);

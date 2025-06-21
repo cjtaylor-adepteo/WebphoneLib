@@ -113,6 +113,8 @@ export class ReconnectableTransport extends EventEmitter implements ITransport {
   private uaFactory: UAFactory;
   private uaOptions: UserAgentOptions;
   private userAgent: UserAgent;
+  /** Custom SIP headers for REGISTER and INVITE */
+  private extraHeaders: string[];
   private dyingCounter = 60000;
   private wsTimeout = 10000;
   private dyingIntervalID: number;
@@ -126,8 +128,9 @@ export class ReconnectableTransport extends EventEmitter implements ITransport {
 
   constructor(uaFactory: UAFactory, options: IClientOptions) {
     super();
-
     this.uaFactory = uaFactory;
+    // Store custom SIP headers
+    this.extraHeaders = options.transport.extraHeaders || [];
     this.configure(options);
 
     this.boundOnWindowOffline = this.onWindowOffline.bind(this);
@@ -659,7 +662,9 @@ export class ReconnectableTransport extends EventEmitter implements ITransport {
       delete this.userAgent.registerers[(this.registerer as any).id];
     }
 
-    this.registerer = new Registerer(this.userAgent, {});
+    this.registerer = new Registerer(this.userAgent, {
+      extraHeaders: this.extraHeaders
+    });
 
     return new Promise((resolve, reject) => {
       // Handle outgoing session state changes.
