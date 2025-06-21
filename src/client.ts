@@ -243,8 +243,9 @@ export class ClientImpl extends EventEmitter implements IClient {
         return await this.tryInvite(uri);
       });
     } catch (e) {
+      // Log and rethrow so callers get a rejected promise instead of undefined
       log.error(e, this.constructor.name);
-      return;
+      throw e;
     }
 
     return session.freeze();
