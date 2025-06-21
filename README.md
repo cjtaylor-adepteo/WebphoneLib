@@ -108,21 +108,22 @@ client.on('invite', (session) => {
 ### Outgoing call
 
 ```javascript
-const session = client.invite('sip:518@<realm>');
-
 try {
+  // Start the outgoing call; rejects if sending INVITE fails
+  const session = await client.invite('sip:518@<realm>');
   showOutgoingCallInProgress();
 
-  let { accepted, rejectCause } = await session.accepted(); // wait until the call is picked up
+  // Wait until the call is accepted or rejected
+  const { accepted, rejectCause } = await session.accepted();
   if (!accepted) {
     showRejectedScreen();
     return;
   }
 
   showCallScreen();
-
   await session.terminated();
 } catch (e) {
+  console.error('Failed to establish call:', e);
 } finally {
   closeCallScreen();
 }
