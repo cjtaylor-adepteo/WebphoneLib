@@ -26,14 +26,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Bump patch version
+        run: |
+          # Bump package.json and package-lock.json without tagging
+          NEW_VER=$(npm version patch --no-git-tag-version)
+          # Strip leading 'v' if present
+          echo "NEW_VERSION=${NEW_VER#v}" >> $GITHUB_ENV
+
       - name: Build dist
         run: npm run build
 
       - name: Commit dist directory
         uses: EndBug/add-and-commit@v9
         with:
-          add: 'dist'
+          add: 'dist package.json package-lock.json'
           force: true
-          message: 'chore: update dist [skip ci]'
+          message: 'chore: bump version ${{ env.NEW_VERSION }} and update dist [skip ci]'
           author_name: 'github-actions[bot]'
           author_email: 'github-actions[bot]@users.noreply.github.com'
