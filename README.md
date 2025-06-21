@@ -13,6 +13,7 @@ Check out the documentation [here](https://open-voip-alliance.github.io/Webphone
 - Allows you to switch audio devices mid-call.
 - Automatically recovers calls on connectivity loss.
 - Offers an easy-to-use modern javascript api.
+- Provides periodic call-quality (MOS) metrics with robust packet-loss calculation (avoiding divide-by-zero).
 
 ## Join us!
 
