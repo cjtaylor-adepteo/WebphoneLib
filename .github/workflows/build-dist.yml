@@ -26,12 +26,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Bump patch version
+      - name: Bump version suffix
         run: |
-          # Bump package.json and package-lock.json without tagging
-          NEW_VER=$(npm version patch --no-git-tag-version)
-          # Strip leading 'v' if present
-          echo "NEW_VERSION=${NEW_VER#v}" >> $GITHUB_ENV
+          # Derive base version and append zero-padded build number
+          BASE=$(node -p "require('./package.json').version.split('-')[0]")
+          BUILD_ID=$(printf "%03d" "$GITHUB_RUN_NUMBER")
+          NEW_VERSION="$BASE-$BUILD_ID"
+          npm version "$NEW_VERSION" --no-git-tag-version
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Build dist
         run: npm run build
