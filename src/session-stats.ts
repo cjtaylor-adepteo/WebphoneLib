@@ -122,14 +122,20 @@ export class SessionStats extends EventEmitter {
     }
 
     if (inbound && candidatePair) {
+      // Calculate fractionLost: use explicit fractionLost if available;
+      // otherwise compute as lost/(lost+received), guarding against division by zero.
+      let fractionLost: number;
+      if (inbound.fractionLost !== undefined && inbound.fractionLost !== null) {
+        fractionLost = inbound.fractionLost;
+      } else {
+        const lost = inbound.packetsLost || 0;
+        const received = inbound.packetsReceived || 0;
+        const total = lost + received;
+        fractionLost = total > 0 ? lost / total : 0;
+      }
       const measurement = {
         jitter: inbound.jitter,
-
-        // Firefox doesn't have `fractionLost`, fallback to calculating the total
-        // packet loss. TODO: It would be better to calculate the fraction of lost
-        // packets since the last measurement.
-        fractionLost: inbound.fractionLost || inbound.packetsLost / inbound.packetsReceived,
-
+        fractionLost,
         // Firefox doesn't have or expose this property. Fallback to using 50ms as
         // a guess for RTT.
         rtt: candidatePair.currentRoundTripTime || 0.05
