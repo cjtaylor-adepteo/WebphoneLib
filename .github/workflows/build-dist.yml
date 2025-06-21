@@ -1,0 +1,39 @@
+name: Build and Commit dist
+
+on:
+  push:
+    branches:
+      - main
+      - development
+
+jobs:
+  build-and-commit:
+    name: Build and commit dist
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build dist
+        run: npm run build
+
+      - name: Commit dist directory
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: 'dist'
+          force: true
+          message: 'chore: update dist [skip ci]'
+          author_name: 'github-actions[bot]'
+          author_email: 'github-actions[bot]@users.noreply.github.com'
