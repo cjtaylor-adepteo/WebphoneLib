@@ -482,13 +482,15 @@ export class SessionImpl extends EventEmitter implements ISession {
   }
 
   protected extractRemoteIdentity() {
+    // Default to the SIP remoteIdentity
     let phoneNumber: string = this.session.remoteIdentity.uri.user;
-    let displayName: string;
+    let displayName: string = this.session.remoteIdentity.displayName;
+    // Override with P-Asserted-Identity if present
     if (this.session.assertedIdentity) {
       phoneNumber = this.session.assertedIdentity.uri.user;
-      displayName = this.session.assertedIdentity.displayName;
+      // Use asserted displayName if available, else fall back
+      displayName = this.session.assertedIdentity.displayName || displayName;
     }
-
     return { phoneNumber, displayName };
   }
 

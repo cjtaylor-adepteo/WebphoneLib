@@ -14,6 +14,14 @@ export interface IClientOptions {
   };
   media: IMedia;
   userAgentString?: string;
+  /**
+   * Optional logging level for the library: debug, info, warn, error, verbose.
+   */
+  logLevel?: 'debug' | 'info' | 'warn' | 'error' | 'verbose';
+  /**
+   * Optional log connector to receive all log entries: level, message, context.
+   */
+  logConnector?: (entry: { level: string; message: any; context: any }) => void;
 }
 
 export type MediaDeviceId = string | undefined;

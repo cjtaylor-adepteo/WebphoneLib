@@ -172,7 +172,12 @@ export class SessionMedia extends EventEmitter implements ISessionMedia {
     audio.srcObject = (this.session as any).__streams.remoteStream;
 
     // This can fail if autoplay is not yet allowed.
-    await audio.play();
+    try {
+      await audio.play();
+    } catch (err) {
+      log.warn(`Audio playback failed: ${err}`, 'session-media');
+      this.emit('setupFailed');
+    }
   }
 
   private setInputDevice(id: string | undefined) {

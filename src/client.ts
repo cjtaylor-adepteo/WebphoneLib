@@ -69,6 +69,12 @@ export interface IClient {
   getSessions(): ISession[];
 
   /**
+   * Enumerate available audio input and output devices.
+   * @returns Promise that resolves to an array of MediaDeviceInfo for audio inputs/outputs.
+   */
+  listMediaDevices(): Promise<MediaDeviceInfo[]>;
+
+  /**
    * Do an attended transfer from session a to session b.
    *
    * ```typescript
@@ -165,6 +171,13 @@ export class ClientImpl extends EventEmitter implements IClient {
 
   constructor(uaFactory: UAFactory, transportFactory: TransportFactory, options: IClientOptions) {
     super();
+    // Apply optional custom logging configuration
+    if (options.logLevel) {
+      log.level = options.logLevel;
+    }
+    if (options.logConnector) {
+      log.connector = options.logConnector;
+    }
 
     if (!Features.checkRequired()) {
       throw new Error('unsupported_browser');
@@ -340,6 +353,18 @@ export class ClientImpl extends EventEmitter implements IClient {
 
   public getSessions(): ISession[] {
     return Object.values(this.sessions).map(session => session.freeze());
+  }
+
+  /**
+   * Enumerate available audio input and output devices.
+   * @returns Promise resolving to array of MediaDeviceInfo
+   */
+  public async listMediaDevices(): Promise<MediaDeviceInfo[]> {
+    if (!navigator.mediaDevices || typeof navigator.mediaDevices.enumerateDevices !== 'function') {
+      throw new Error('media-devices-not-supported');
+    }
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    return devices.filter(d => d.kind === 'audioinput' || d.kind === 'audiooutput');
   }
 
   public attendedTransfer(a: ISession, b: ISession): Promise<boolean> {

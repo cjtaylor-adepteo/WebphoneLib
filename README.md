@@ -190,6 +190,18 @@ session.media.setInput({
 });
 ```
 
+#### Handling audio autoplay failures
+
+SessionMedia emits a `setupFailed` event when the browser blocks audio playback due to autoplay policies. You can listen for this to prompt your users to enable audio:
+
+```javascript
+client.on('invite', session => {
+  session.media.on('setupFailed', () => {
+    // e.g., show a “Tap to enable audio” prompt
+  });
+});
+```
+
 ## Commands
 
 | Command                   | Help                                                                            |
@@ -202,6 +214,32 @@ session.media.setInput({
 | npm run prepare           | Prepare the project for publish, this is automatically run before `npm publish` |
 | npm run lint              | Run `tslint` over the source files                                              |
 | npm run typecheck         | Verifies type constraints are met                                               |
+
+## Enumerating Media Devices
+
+You can now easily list available audio input and output devices via:
+
+```javascript
+const devices = await client.listMediaDevices();
+devices.forEach(d => console.log(d.kind, d.label, d.deviceId));
+```
+
+## Configuring Logging
+
+Customize library log level and capture log entries with the `logLevel` and `logConnector` options:
+
+```javascript
+const client = new Client({
+  account,
+  transport,
+  media,
+  logLevel: 'debug',
+  logConnector: ({ level, message, context }) => {
+    // send logs to your telemetry service
+    console.log(`[${level}]`, message, context);
+  }
+});
+```
 
 ## Generate documentation
 
