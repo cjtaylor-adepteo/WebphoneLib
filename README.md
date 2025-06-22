@@ -14,6 +14,7 @@ Check out the documentation [here](https://open-voip-alliance.github.io/Webphone
 - Automatically recovers calls on connectivity loss.
 - Offers an easy-to-use modern javascript api.
 - Provides periodic call-quality (MOS) metrics with robust packet-loss calculation (avoiding divide-by-zero).
+- Robustly handles audio node cleanup on muting or teardown to avoid disconnect errors across browsers.
 
 ## Join us!
 
