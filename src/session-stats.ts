@@ -81,9 +81,17 @@ export class SessionStats extends EventEmitter {
 
     // Set up stats timer to periodically query and process the peer connection's
     // statistics and feed them to the stats aggregator.
-    session.once('SessionDescriptionHandler-created', () => {
+    const startStatsTimer = () => {
+      if (this.statsTimer) {
+        return;
+      }
       this.statsTimer = window.setInterval(() => {
-        const pc = (session.sessionDescriptionHandler as any).peerConnection;
+        // Attempt to get the RTCPeerConnection; guard if not yet available
+        const sdh: any = session.sessionDescriptionHandler as any;
+        const pc = sdh && sdh.peerConnection;
+        if (!pc) {
+          return;
+        }
         pc.getStats().then((stats: RTCStatsReport) => {
           if (this.add(stats)) {
             this.emit('statsUpdated', this);
@@ -92,7 +100,15 @@ export class SessionStats extends EventEmitter {
           }
         });
       }, this.statsInterval);
-    });
+    };
+    // Listen for SDH creation
+    session.once('SessionDescriptionHandler-created', startStatsTimer);
+    // If the handler already exists, start immediately
+    // If handler already exists with a peerConnection, start immediately
+    const existingSDH: any = session.sessionDescriptionHandler as any;
+    if (existingSDH && existingSDH.peerConnection) {
+      startStatsTimer();
+    }
   }
 
   public clearStatsTimer() {
