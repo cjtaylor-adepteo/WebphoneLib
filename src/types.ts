@@ -24,7 +24,10 @@ export interface IClientOptions {
   /**
    * Optional logging level for the library: debug, info, warn, error, verbose.
    */
-  logLevel?: 'debug' | 'info' | 'warn' | 'error' | 'verbose';
+  /**
+   * Optional logging level for the library. Matches SIP.js levels: debug, log, info, warn, error, verbose.
+   */
+  logLevel?: 'debug' | 'log' | 'info' | 'warn' | 'error' | 'verbose';
   /**
    * Optional log connector to receive all log entries: level, message, context.
    */
