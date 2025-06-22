@@ -396,7 +396,21 @@ export class SessionImpl extends EventEmitter implements ISession {
     // no feedback about the failure.
     //
     // For now only use the RTP method using the session description handler.
-    return this.session.sessionDescriptionHandler.sendDtmf(tones, options);
+    // Attempt RTP-based DTMF through the SessionDescriptionHandler
+    const sdh: any = this.session.sessionDescriptionHandler as any;
+    if (sdh && typeof sdh.sendDtmf === 'function') {
+      try {
+        const result = sdh.sendDtmf(tones, options);
+        // sendDtmf returns boolean; if undefined, assume success
+        return result != null ? result : true;
+      } catch (e) {
+        log.warn(`RTP DTMF failed: ${e}`, this.constructor.name);
+        return false;
+      }
+    }
+    // DTMF via RTP not supported; no INFO fallback implemented
+    log.warn('DTMF not supported: RTP sendDtmf unavailable', this.constructor.name);
+    return false;
   }
 
   public get localStream() {

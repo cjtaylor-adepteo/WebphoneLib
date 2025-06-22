@@ -16,6 +16,19 @@ Check out the documentation [here](https://open-voip-alliance.github.io/Webphone
 - Provides periodic call-quality (MOS) metrics with robust packet-loss calculation (avoiding divide-by-zero).
 - Robustly handles audio node cleanup on muting or teardown to avoid disconnect errors across browsers.
 
+### DTMF (Touch-Tone) Support
+
+Send DTMF tones over the RTP channel:
+
+```js
+const success = session.dtmf('123#');
+if (!success) {
+  console.warn('DTMF not sent: RTP unsupported or error');
+}
+```
+
+Note: INFO-based DTMF fallback is not currently implemented.
+
 ## Join us!
 
 We would love more input for this project. Create an issue, create a pull request for an issue, or if you're not really sure, ask us. We're often hanging around on [discourse](https://discourse.openvoipalliance.org/). We would also love to hear your thoughts and feedback on our project and answer any questions you might have!
