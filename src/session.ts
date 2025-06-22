@@ -367,7 +367,8 @@ export class SessionImpl extends EventEmitter implements ISession {
       try {
         sdh.peerConnection.close();
       } catch (e) {
-        log.warn('Error closing old peerConnection', e, this.constructor.name);
+        // Log the error with context; warn takes (message, context)
+        log.warn(`Error closing old peerConnection: ${e}`, this.constructor.name);
       }
     }
     // Reset and recreate the session description handler
