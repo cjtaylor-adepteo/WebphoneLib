@@ -14,6 +14,13 @@ export class Invitation extends SessionImpl {
     this.acceptedPromise = new Promise(resolve => {
       this.acceptedRef = resolve;
     });
+    // Handle mid-session re-INVITEs: update remote identity and emit event
+    this.session.delegate = {
+      onInvite: () => {
+        this._remoteIdentity = this.extractRemoteIdentity();
+        this.emit('remoteIdentityUpdate', this, this.remoteIdentity);
+      }
+    };
 
     this.cancelled = options.cancelled;
 
@@ -26,13 +33,6 @@ export class Invitation extends SessionImpl {
       this.status = SessionStatus.ACTIVE;
       this.emit('statusUpdate', { id: this.id, status: this.status });
       this.acceptedRef({ accepted: true });
-
-      this.session.delegate = {
-        onInvite: () => {
-          this._remoteIdentity = this.extractRemoteIdentity();
-          this.emit('remoteIdentityUpdate', this, this.remoteIdentity);
-        }
-      };
     });
   }
 

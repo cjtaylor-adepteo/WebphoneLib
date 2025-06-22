@@ -100,20 +100,24 @@ await client.register();
 
 ```javascript
 // incoming call below
-client.on('invite', (session) => {
+client.on('invite', async session => {
+  // Start ringing
+  ringer();
+  // Update remote identity on mid-call re-INVITEs
+  session.on('remoteIdentityUpdate', (s, identity) => {
+    updateCallerInfo(identity.displayName);
+  });
   try {
-    ringer();
-
-    let { accepted, rejectCause } = await session.accepted(); // wait until the call is picked up
+    const { accepted, rejectCause } = await session.accepted(); // wait until call accepted/rejected
     if (!accepted) {
+      showRejectedScreen();
       return;
     }
-
+    // Show in-call UI
     showCallScreen();
-
     await session.terminated();
   } catch (e) {
-    showErrorMessage(e)
+    showErrorMessage(e);
   } finally {
     closeCallScreen();
   }
