@@ -410,6 +410,11 @@ export class ReconnectableTransport extends EventEmitter implements ITransport {
           onCancel(message);
         };
         this.emit('invite', { invitation, cancelled });
+      },
+      // End onInvite handler
+      onMessage: (message: any) => {
+        // Emit out-of-dialog MESSAGE on the client
+        this.emit('message', message);
       }
     };
 

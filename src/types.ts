@@ -10,7 +10,14 @@ export interface IClientOptions {
   transport: {
     wsServers: string;
     iceServers: string[];
+    /**
+     * Optional delegate for incoming INVITE handling.
+     */
     delegate?: ITransportDelegate;
+    /**
+     * Custom SIP headers to include on REGISTER and INVITE requests.
+     */
+    extraHeaders?: string[];
   };
   media: IMedia;
   userAgentString?: string;

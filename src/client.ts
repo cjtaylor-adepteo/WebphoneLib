@@ -113,6 +113,21 @@ export interface IClient {
    * ```
    */
   on(event: 'invite', listener: (session: ISession) => void): this;
+  /**
+   * Send an instant message (SIP MESSAGE) to a target URI.
+   * @param target SIP URI to message (e.g. 'sip:alice@example.com')
+   * @param body Message body text
+   * @param extraHeaders Optional array of SIP header strings
+   */
+  sendMessage(target: string, body: string, extraHeaders?: string[]): Promise<void>;
+  /**
+   * Event fired when an out-of-dialog SIP MESSAGE is received.
+   * Listener receives (from, body, headers).
+   */
+  on(
+    event: 'message',
+    listener: (from: string, body: string, headers: Record<string, string[]>) => void
+  ): this;
 
   /**
    * When a notify event for a specific subscription occurs, the status is
@@ -393,6 +408,22 @@ export class ClientImpl extends EventEmitter implements IClient {
 
     return this.transport.createPublisher(contact, options);
   }
+  /**
+   * Send an instant message (SIP MESSAGE) to a target URI.
+   */
+  public async sendMessage(target: string, body: string, extraHeaders?: string[]): Promise<void> {
+    if (!this.transport.registeredPromise) {
+      throw new Error('Register first!');
+    }
+    await this.transport.registeredPromise;
+    const ua = (this.transport as any).userAgent;
+    if (!ua || typeof ua.message !== 'function') {
+      throw new Error('SIP MESSAGE not supported');
+    }
+    // Use provided extraHeaders or fall back to default transport headers
+    const options: any = { extraHeaders: extraHeaders || this.transport.extraHeaders || [] };
+    ua.message(target, body, options);
+  }
 
   private configureTransport(uaFactory: UAFactory, options: IClientOptions) {
     this.transport = this.transportFactory(uaFactory, options);
@@ -441,6 +472,15 @@ export class ClientImpl extends EventEmitter implements IClient {
         this.connected = false;
       }
       this.emit('statusUpdate', status);
+    });
+    // Handle out-of-dialog SIP MESSAGE
+    this.transport.on('message', (message: any) => {
+      // Extract sender URI and body
+      const fromHeader = message.request.from;
+      const from = fromHeader && fromHeader.uri ? fromHeader.uri.toString() : undefined;
+      const body = message.request.body;
+      const headers = message.request.headers;
+      this.emit('message', from, body, headers);
     });
   }
 
@@ -562,6 +602,7 @@ export const Client: ClientCtor = (function(clientOptions: IClientOptions) {
     'getSession',
     'getSessions',
     'invite',
+    'sendMessage',
     'isConnected',
     'on',
     'once',
