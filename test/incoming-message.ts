@@ -1,5 +1,8 @@
 // @ts-nocheck
 import test from 'ava';
+import * as Features from '../src/features';
+// Force browser features check to pass
+sinon.stub(Features, 'checkRequired').returns(true);
 import { EventEmitter } from 'events';
 import { ClientImpl } from '../src/client';
 import { IClientOptions, IMedia } from '../src/types';
