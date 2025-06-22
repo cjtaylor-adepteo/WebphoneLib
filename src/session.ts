@@ -361,6 +361,16 @@ export class SessionImpl extends EventEmitter implements ISession {
    * Reconfigure the WebRTC peerconnection.
    */
   public rebuildSessionDescriptionHandler() {
+    // Clean up old SessionDescriptionHandler and its RTCPeerConnection to avoid leaks
+    const sdh: any = (this.session as any).sessionDescriptionHandler;
+    if (sdh && sdh.peerConnection) {
+      try {
+        sdh.peerConnection.close();
+      } catch (e) {
+        log.warn('Error closing old peerConnection', e, this.constructor.name);
+      }
+    }
+    // Reset and recreate the session description handler
     (this.session as any)._sessionDescriptionHandler = undefined;
     (this.session as any).setupSessionDescriptionHandler();
   }
