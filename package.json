@@ -28,7 +28,6 @@
   },
   "ava": {
     "require": [
-      "esm",
       "ts-node/register",
       "./test/_setup-browser-env.js"
     ],
