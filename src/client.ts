@@ -421,7 +421,7 @@ export class ClientImpl extends EventEmitter implements IClient {
       throw new Error('SIP MESSAGE not supported');
     }
     // Use provided extraHeaders or fall back to default transport headers
-    const options: any = { extraHeaders: extraHeaders || this.transport.extraHeaders || [] };
+    const options: any = { extraHeaders: extraHeaders || this.extraHeaders || [] };
     ua.message(target, body, options);
   }
 
