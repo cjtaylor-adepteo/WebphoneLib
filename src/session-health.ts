@@ -27,9 +27,14 @@ export function checkAudioConnected(
             case 'connected':
               resolve();
               break;
-
+            // Treat any fatal/closed states as failure
             case 'failed':
-              reject();
+            case 'disconnected':
+            case 'closed':
+              reject(new Error(`RTCPeerConnection connectionState: ${pc.connectionState}`));
+              break;
+            default:
+              // Other states ('new', 'connecting') are ignored until resolved or failed
               break;
           }
         });
