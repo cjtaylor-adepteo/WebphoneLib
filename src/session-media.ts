@@ -203,7 +203,7 @@ export class SessionMedia extends EventEmitter implements ISessionMedia {
           this.inputNode.disconnect((this.session as any).__streams.localStream);
         } catch (e) {
           // Swallow errors when disconnecting on mute; node may already be disconnected
-          log.debug('error disconnecting input audio node on mute', e, 'media');
+          log.debug(`error disconnecting input audio node on mute: ${e}`, 'media');
         }
       } else {
         this.inputNode.connect((this.session as any).__streams.localStream);
@@ -241,7 +241,7 @@ export class SessionMedia extends EventEmitter implements ISessionMedia {
         this.inputNode.disconnect();
       } catch (e) {
         // Swallow errors when disconnecting input node; may already be disconnected
-        log.debug('error disconnecting input audio node during stopInput', e, 'media');
+        log.debug(`error disconnecting input audio node during stopInput: ${e}`, 'media');
       }
     }
   }
