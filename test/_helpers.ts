@@ -5,10 +5,12 @@ import { UA as UABase } from 'sip.js';
 import { UserAgent } from 'sip.js/lib/api/user-agent';
 import { UserAgentOptions } from 'sip.js/lib/api/user-agent-options';
 
+import { IClientOptions } from '../src/types';
+
 import { ClientImpl } from '../src/client';
 import { ClientStatus } from '../src/enums';
 import * as Features from '../src/features';
-import { Client, IClientOptions } from '../src/index';
+import { Client } from '../src/index';
 import { ReconnectableTransport, TransportFactory, UAFactory } from '../src/transport';
 
 export function defaultUAFactory() {
@@ -19,17 +21,16 @@ export function defaultTransportFactory() {
   return (uaFactory: UAFactory, options: IClientOptions) =>
     new ReconnectableTransport(uaFactory, options);
 }
-
+/**
+ * Create a ClientImpl with minimal default options, merged with any overrides.
+ */
 export function createClientImpl(
   uaFactory: UAFactory,
   transportFactory: TransportFactory,
-  additionalOptions: UserAgentOptions = {}
+  optionsOverrides: Partial<IClientOptions> = {}
 ): ClientImpl {
-  return new ClientImpl(
-    uaFactory,
-    transportFactory,
-    Object.assign(minimalOptions(), additionalOptions)
-  );
+  const opts: IClientOptions = Object.assign({}, minimalOptions(), optionsOverrides);
+  return new ClientImpl(uaFactory, transportFactory, opts);
 }
 
 export function createClient() {

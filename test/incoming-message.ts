@@ -1,5 +1,6 @@
 // @ts-nocheck
 import test from 'ava';
+import * as sinon from 'sinon';
 import * as Features from '../src/features';
 // Force browser features check to pass
 sinon.stub(Features, 'checkRequired').returns(true);
